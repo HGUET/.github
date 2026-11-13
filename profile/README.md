@@ -47,28 +47,11 @@ Autonomous agents can submit valid onchain transactions that do not match the pa
 
 ### Explore the projects
 
-<table>
-<tr>
-<td width="50%" valign="top">
-
-**[HGUET / hguet](https://github.com/HGUET/hguet)**
-
-Open-source Rust CLI · transaction analysis · local security policies · public protocol definitions.
-
-[Explore the repository →](https://github.com/HGUET/hguet)
-
-</td>
-<td width="50%" valign="top">
-
-**HGUET / server — private**
-
-Proprietary Rust Cloud architecture · Solana intelligence · identity · prepaid billing.
-
-Its interface is specified in the [public interoperability contract](https://github.com/HGUET/hguet/blob/main/docs/architecture/interoperability.md).
-
-</td>
-</tr>
-</table>
+| **Open-source CLI** | **Private Intelligence Server** |
+| :--- | :--- |
+| **[HGUET / hguet](https://github.com/HGUET/hguet)** | **HGUET / server** *(private)* |
+| Rust CLI, transaction analysis, local security policies and public protocol definitions. | Rust Cloud architecture, Solana intelligence, account security and prepaid billing. |
+| [Explore the repository](https://github.com/HGUET/hguet) | [Read the public interoperability specification](https://github.com/HGUET/hguet/blob/main/docs/architecture/interoperability.md) |
 
 ---
 
