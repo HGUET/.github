@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="https://avatars.githubusercontent.com/u/356244489?v=4" alt="HGUET emblem" width="112" height="112">
-
 # HGUET
 
 ### Security before the signature.
