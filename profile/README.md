@@ -4,79 +4,95 @@
 
 ### Security before the signature.
 
-**The independent security layer for AI-agent payments on Solana.**
+**Open-source, pre-signature security research for AI-initiated payments on Solana.**
 
-[![Status: Pre-alpha](https://img.shields.io/badge/STATUS-PRE--ALPHA-9b82ff?style=for-the-badge&labelColor=111827)](https://github.com/HGUET/hguet)
-[![Solana](https://img.shields.io/badge/ECOSYSTEM-SOLANA-5ae9ce?style=for-the-badge&labelColor=111827)](https://solana.com)
-[![Rust](https://img.shields.io/badge/BACKEND-RUST-cbd7e7?style=for-the-badge&labelColor=111827)](https://github.com/HGUET/hguet)
+[![Stage](https://img.shields.io/badge/stage-pre--alpha-9b82ff?style=flat-square)](https://github.com/HGUET/hguet)
+[![Core](https://img.shields.io/badge/core-Rust-6ee7d2?style=flat-square)](https://github.com/HGUET/hguet)
+[![Network](https://img.shields.io/badge/network-Solana-a68cff?style=flat-square)](https://solana.com/)
+[![Release](https://img.shields.io/badge/release-not%20yet-8b9bb7?style=flat-square)](https://github.com/HGUET/hguet/releases)
 
-[**Website**](https://hguet.fr) &nbsp;•&nbsp; [**Open-source CLI**](https://github.com/HGUET/hguet) &nbsp;•&nbsp; [**Technical architecture**](https://github.com/HGUET/hguet/tree/main/docs/architecture)
+[**Project website**](https://hguet.fr/) · [**Public Rust CLI**](https://github.com/HGUET/hguet) · [**Architecture**](https://github.com/HGUET/hguet/tree/main/docs/architecture) · [**Protocol v1**](https://github.com/HGUET/hguet/tree/main/protocol/v1)
 
 </div>
 
 ---
 
-## A valid transaction can still be the wrong payment.
+## A valid Solana transaction is not necessarily an authorized payment
 
-Autonomous agents can submit valid onchain transactions that do not match the payment a user intended: a different recipient, the wrong token, an excessive amount, or unexpected program permissions.
+A successful simulation, a valid signature, or an agent's assertion of intent cannot establish that a transfer matches **the user's independent authorization**. HGUET is being built to inspect transaction effects, check separately trusted payment intentions, apply restrictive local policy, and make uncertainty visible **before customer-controlled signing**.
 
-**HGUET is building a pre-signature security checkpoint** to help developers understand transaction effects, verify trusted payment intentions, and decide what to do when evidence is incomplete.
+The goal is **a security checkpoint, not an autonomous wallet or a guarantee of safety**.
 
-### What we're building
+## What exists in source today
 
-| Open-source HGUET CLI | Optional HGUET Intelligence Cloud |
-| :--- | :--- |
-| Decode and simulate Solana transactions | Continuously updated network and program signals |
-| Compare transfers with independently trusted intent | Threat intelligence with source attribution |
-| Apply local policy and spending constraints | Cross-session payment-risk context |
-| Return explainable `ALLOW / WARN / DENY / UNKNOWN` decisions | Authenticated enrichment and signed reports |
-| Operate without a HGUET account in local mode | Optional prepaid, usage-based access |
+| Workstream | Present implementation | Boundary |
+| :--- | :--- | :--- |
+| **Public Rust CLI** | Offline legacy/v0/v1 transaction parsing; signature and signed-intent verification; direct SOL and selected SPL Token / Token-2022 checks; restrictive policy; structured findings | **Pre-alpha source, no stable release.** Does not certify complete transaction effects |
+| **Opt-in Solana RPC** | Read-only simulation, account and token observations, limited CPI analysis and source-aware effect correlation | Provider-derived and non-atomic evidence is **advisory**, not execution proof |
+| **Signer boundary** | Separate-process, Linux sandbox and replay-protection prototypes | **BLOCK-only.** No wallet SDK, signing, broadcast or automatic authorization |
+| **Private Rust server** | Pricing and signed-report primitives; PostgreSQL paid-job storage; two-origin finalized **Devnet** payment verification; bounded history worker; operator refund-review workflow | Unreleased; operator-driven pieces are **not** a live end-to-end Cloud service |
+| **Cloud transport prototype** | Loopback-only TLS 1.3 / Protobuf with post-quantum-capable cryptography and narrowly scoped completed-result retrieval | No Internet-facing paid API, new paid-job admission or public service |
 
-> **Development status:** HGUET is **pre-alpha**. These capabilities describe the intended architecture, not a released or audited security product. The sample checks shown on the website are illustrative and must not be relied on to protect live funds.
+**Current local decision boundary:** the public CLI intentionally produces restrictive **DENY** or **UNKNOWN** results, **never an automatic ALLOW to sign**. A trusted external wallet/signer must remain the enforcement boundary.
 
-### Built around clear security boundaries
+The private server prototype uses **anonymous, native-SOL pay-per-check on sandbox Devnet**, not customer accounts, subscriptions, USDC credits or production Mainnet billing. Its parts are not connected into a released payment-to-assessment workflow. Server verification, real cross-platform interoperability, independent audit and deployment approval remain outstanding.
 
-- **Non-custodial:** no customer wallet private keys, custody, transaction signing or broadcasting.
-- **Local-first:** the free CLI is designed to remain independently useful; RPC simulation uses your configured provider.
-- **Intent-aware:** a valid blockchain simulation alone does not prove that a payment is authorized.
-- **Explicit uncertainty:** `UNKNOWN` means required evidence is unavailable, stale or unsupported — not safe by default.
-- **Inspectability:** public CLI behavior, protocol contracts and verdict schemas are documented in the open.
-- **Customer-controlled enforcement:** an external wallet or signer must enforce the result before signing.
+## Architecture and trust model
 
-### Explore the projects
+\`\`\`text
+Agent proposes transaction
+          |
+          v
+  HGUET open-source CLI  <--- independently trusted PaymentIntent + local policy
+      |          |
+      |          +---- opt-in read-only Solana RPC evidence
+      v
+ DENY / UNKNOWN  ---> customer-controlled signer remains the final gate
 
-| **Open-source CLI** | **Private Intelligence Server** |
-| :--- | :--- |
-| **[HGUET / hguet](https://github.com/HGUET/hguet)** | **HGUET / server** *(private)* |
-| Rust CLI, transaction analysis, local security policies and public protocol definitions. | Rust Cloud architecture, Solana intelligence, account security and prepaid billing. |
-| [Explore the repository](https://github.com/HGUET/hguet) | [Read the public interoperability specification](https://github.com/HGUET/hguet/blob/main/docs/architecture/interoperability.md) |
+Future optional path (NOT available as a public service):
+ CLI --- authenticated Cloud protocol ---> HGUET private Devnet research backend
+                                             pricing / provenance / signed artifacts
+\`\`\`
 
----
+- **Non-custodial:** HGUET does not hold funds or request wallet private keys.
+- **Local-first:** offline inspection works without a HGUET account; RPC is explicitly configured and may disclose queried transaction/account data to that provider.
+- **Trust separation:** an AI agent cannot manufacture its own authorization by supplying a "trusted" intent, policy or signing key.
+- **Explicit uncertainty:** a simulation, a partial instruction decode or stale/opaque source evidence must not silently become permission to pay.
+- **Inspectable contracts:** the public [protocol schemas](https://github.com/HGUET/hguet/tree/main/protocol/v1), [architecture](https://github.com/HGUET/hguet/tree/main/docs/architecture) and [implementation notes](https://github.com/HGUET/hguet/tree/main/docs/implementation) are open for review.
 
-### Support open-source development
+## Repositories
 
-If the project is useful to you, voluntary donations help support its development.
+| Repository | Scope | Visibility |
+| :--- | :--- | :--- |
+| [**HGUET/hguet**](https://github.com/HGUET/hguet) | Rust CLI, local policy, restricted signer research, public protocol and tests | Public |
+| **HGUET/server** | Rust intelligence, Devnet settlement, PostgreSQL, PQ transport and operational tooling | Private |
+| **HGUET/web** | Static website source; product explanations and illustrative demo | Private |
+| [**HGUET/.github**](https://github.com/HGUET/.github) | This organization profile | Public |
 
-**Solana mainnet · Native SOL**
+The [website](https://hguet.fr/) describes the direction of the project; its interactive examples **do not execute checks or process payments**.
 
-```text
+## Development and release status
+
+**Pre-alpha · 16 November 2026.** Source code and automated checks exist; there are **no published HGUET product releases**, no independently audited security approval and no production Cloud endpoint. Public CLI CI has passed on recent revisions, while private server GitHub Actions has not completed its required validation. Do not use this project to approve transfers of live funds.
+
+We welcome source-level discussion, test cases and adversarial reviews through the [public repository](https://github.com/HGUET/hguet). The roadmap is research and implementation work, **not a promise of release dates or a security SLA**.
+
+## Support development (optional)
+
+Donations can support open-source work. The address below is for **voluntary native SOL on Solana Mainnet only**, **not** a Cloud invoice or service-credit address.
+
+\`\`\`text
 39iqkHNMqncEPp3p52zKwUHnYzk2MJbcaHyY4Hhg2fWC
-```
+\`\`\`
 
-[View donation address on Solscan](https://solscan.io/account/39iqkHNMqncEPp3p52zKwUHnYzk2MJbcaHyY4Hhg2fWC)
-
-*This address accepts voluntary donations only. It is not an address for HGUET Cloud subscriptions, service credits, or USDC invoices. Always verify the network and complete wallet address before transferring.*
+[View on Solscan](https://solscan.io/account/39iqkHNMqncEPp3p52zKwUHnYzk2MJbcaHyY4Hhg2fWC) · Always verify the full address and network independently before sending.
 
 ---
 
 <div align="center">
 
-### Secure the intent. Verify the transaction.
+**Secure the intent. Verify the transaction. Keep signing under human-controlled policy.**
 
-**Free to verify locally. Optional deeper intelligence.**
-
-[GitHub](https://github.com/HGUET/hguet) &nbsp;•&nbsp; [hguet.fr](https://hguet.fr)
-
-<sub>HGUET is an independent project in the Solana ecosystem. It is not affiliated with or endorsed by the Solana Foundation.</sub>
+<sub>HGUET is an independent Solana ecosystem project. It is not affiliated with or endorsed by the Solana Foundation.</sub>
 
 </div>
