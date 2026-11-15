@@ -39,7 +39,7 @@ The private server prototype uses **anonymous, native-SOL pay-per-check on sandb
 
 ## Architecture and trust model
 
-\`\`\`text
+```text
 Agent proposes transaction
           |
           v
@@ -52,7 +52,7 @@ Agent proposes transaction
 Future optional path (NOT available as a public service):
  CLI --- authenticated Cloud protocol ---> HGUET private Devnet research backend
                                              pricing / provenance / signed artifacts
-\`\`\`
+```
 
 - **Non-custodial:** HGUET does not hold funds or request wallet private keys.
 - **Local-first:** offline inspection works without a HGUET account; RPC is explicitly configured and may disclose queried transaction/account data to that provider.
@@ -81,9 +81,9 @@ We welcome source-level discussion, test cases and adversarial reviews through t
 
 Donations can support open-source work. The address below is for **voluntary native SOL on Solana Mainnet only**, **not** a Cloud invoice or service-credit address.
 
-\`\`\`text
+```text
 39iqkHNMqncEPp3p52zKwUHnYzk2MJbcaHyY4Hhg2fWC
-\`\`\`
+```
 
 [View on Solscan](https://solscan.io/account/39iqkHNMqncEPp3p52zKwUHnYzk2MJbcaHyY4Hhg2fWC) · Always verify the full address and network independently before sending.
 
